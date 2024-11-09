@@ -45,6 +45,7 @@ class MyApp extends ConsumerWidget {
       localizationsDelegates: context.localizationDelegates, // Get localization delegates from easy_localization
       initialRoute: AppRoutes.authPage, // Set initial route
       onGenerateRoute: AppRoutes.generateRoute, // Use AppRoutes for route generation
+      debugShowCheckedModeBanner: false,
     );
   }
 }

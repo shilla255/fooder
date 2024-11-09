@@ -1,4 +1,4 @@
-package com.example.fooder;
+package com.alphatechlab.fooder;
 
 import io.flutter.embedding.android.FlutterActivity;
 

@@ -16,16 +16,17 @@ class StylishBottomNavBar extends StatefulWidget {
   _StylishBottomNavBarState createState() => _StylishBottomNavBarState();
 }
 
-class _StylishBottomNavBarState extends State<StylishBottomNavBar> with SingleTickerProviderStateMixin {
+class _StylishBottomNavBarState extends State<StylishBottomNavBar>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late List<Animation<double>> _animations;
 
   final List<IconData> _icons = [
-    CupertinoIcons.home,
+    CupertinoIcons.house_fill,
     CupertinoIcons.search,
-    CupertinoIcons.heart,
-    CupertinoIcons.cart,
-    CupertinoIcons.person,
+    CupertinoIcons.heart_fill,
+    CupertinoIcons.cart_fill,
+    CupertinoIcons.person_fill,
   ];
 
   final List<String> _labels = [
@@ -41,17 +42,17 @@ class _StylishBottomNavBarState extends State<StylishBottomNavBar> with SingleTi
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
     );
     _animations = List.generate(
       5,
-      (index) => Tween<double>(begin: 0, end: 1).animate(
+          (index) => Tween<double>(begin: 0.8, end: 1.2).animate(
         CurvedAnimation(
           parent: _controller,
           curve: Interval(
-            index * 0.2,
-            (index + 1) * 0.2,
-            curve: Curves.easeInOut,
+            index * 0.1,
+            (index + 1) * 0.1,
+            curve: Curves.elasticOut,
           ),
         ),
       ),
@@ -67,60 +68,85 @@ class _StylishBottomNavBarState extends State<StylishBottomNavBar> with SingleTi
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
+      height: 75,
+      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, -5),
+            spreadRadius: -5,
+            offset: const Offset(0, -2),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(5, (index) => _buildNavItem(index)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(5, (index) => _buildNavItem(index)),
+        ),
       ),
     );
   }
 
   Widget _buildNavItem(int index) {
     bool isSelected = widget.selectedIndex == index;
-    Color itemColor = isSelected ? Colors.black : Colors.grey;
+    Color itemColor = isSelected
+        ? Theme.of(context).primaryColor
+        : Colors.grey.shade600;
 
     return GestureDetector(
       onTap: () {
         widget.onItemSelected(index);
-        if (isSelected) {
-          _controller.forward(from: 0);
-        }
+        _controller.forward(from: 0);
         _navigateToPage(index);
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).primaryColor.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
+      child: Container(
+        width: 65,
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             ScaleTransition(
               scale: _animations[index],
-              child: Icon(_icons[index], color: itemColor),
-            ),
-            if (isSelected)
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 300),
-                style: TextStyle(
-                  color: itemColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-                child: Text(' ${_labels[index]}'),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (isSelected)
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  Icon(
+                    _icons[index],
+                    color: itemColor,
+                    size: 24,
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(height: 4),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                color: itemColor,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+              child: Text(_labels[index]),
+            ),
           ],
         ),
       ),
@@ -143,7 +169,7 @@ class _StylishBottomNavBarState extends State<StylishBottomNavBar> with SingleTi
         route = AppRoutes.cartPage;
         break;
       case 4:
-        route = AppRoutes.profilePage; // Ensure correct route for profile
+        route = AppRoutes.profilePage;
         break;
       default:
         route = AppRoutes.homePage;
